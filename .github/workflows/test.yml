@@ -1,17 +1,25 @@
 name: Test My Go Action
 
 on:
-  push:
   workflow_dispatch:
 
 jobs:
   test-job:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: sathirak/container-registry-cleaner@latest
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Clean images
+        uses: sathirak/container-registry-cleaner@latest
         with:
-          registry: 'ghcr.io'
-          name: 'sathirak/container-registry-cleaner'
-          username: 'sathirak'
+          registry: ghcr.io
+          name: sathirak/container-registry-cleaner
+          username: sathirak
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean images
+        uses: sathirak/container-registry-cleaner@latest
+        with:
+          registry: ghcr.io
+          name: library/alpine

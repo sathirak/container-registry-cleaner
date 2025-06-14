@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+
 	registry := githubactions.GetInput("registry")
 	repoName := githubactions.GetInput("name")
 	if repoName == "" {
@@ -45,6 +46,25 @@ func main() {
 	}
 
 	for _, tag := range tags {
-		fmt.Println(tag)
+		tagRef, err := name.NewTag(fmt.Sprintf("%s:%s", fullRepo, tag))
+		if err != nil {
+			fmt.Printf("%s: error parsing tag: %v\n", tag, err)
+			continue
+		}
+		img, err := remote.Image(tagRef, opts...)
+		if err != nil {
+			fmt.Printf("%s: error fetching image: %v\n", tag, err)
+			continue
+		}
+		cfg, err := img.ConfigFile()
+		if err != nil {
+			fmt.Printf("%s: error fetching config: %v\n", tag, err)
+			continue
+		}
+		created := ""
+		if !cfg.Created.Time.IsZero() {
+			created = cfg.Created.UTC().Format("2006-01-02 15:04:05 MST")
+		}
+		fmt.Printf("%s\t%s\n", tag, created)
 	}
 }
