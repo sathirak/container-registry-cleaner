@@ -1,0 +1,8 @@
+# your-repo/action.yml
+name: My action
+author: My name
+description: My description
+
+runs:
+  using: docker
+  image: Dockerfile
