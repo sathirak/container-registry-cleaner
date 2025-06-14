@@ -10,16 +10,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Clean images [ private ]
+      - name: Clean images
         uses: sathirak/container-registry-cleaner@latest
         with:
           registry: ghcr.io
           name: sathirak/container-registry-cleaner
           username: sathirak
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Clean images [ public ]
-        uses: sathirak/container-registry-cleaner@latest
-        with:
-          registry: index.docker.io
-          name: library/alpine
+          max-images: 1

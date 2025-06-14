@@ -12,10 +12,13 @@ inputs:
     required: true
   username:
     description: 'Registry username (optional, for private registries)'
-    required: false
+    required: true
   password:
     description: 'Registry password (optional, for private registries)'
-    required: false
+    required: true
+  max-images:
+    description: 'Maximum number of images to keep'
+    required: true
 
 runs:
   using: docker
