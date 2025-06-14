@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./ # local path to your action
+      - uses: sathirak/container-registry-cleaner@v2
         with:
-          name: 'Go Developer'
+          name: 'library/alpine'

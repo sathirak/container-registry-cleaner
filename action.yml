@@ -4,8 +4,8 @@ author: My name
 description: My description
 
 inputs:
-  val:
-    description: 'A value to print'
+  name:
+    description: 'Docker Registry name'
     required: true
 
 runs:
