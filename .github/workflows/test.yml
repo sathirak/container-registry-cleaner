@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: sathirak/container-registry-cleaner@v2
+      - uses: docker://ghcr.io/sathirak/container-registry-cleaner:latest
         with:
           name: 'library/alpine'

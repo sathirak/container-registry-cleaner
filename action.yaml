@@ -1,0 +1,13 @@
+# your-repo/action.yml
+name: My action
+author: My name
+description: My description
+
+inputs:
+  name:
+    description: 'A value to print'
+    required: true
+
+runs:
+  using: docker
+  image: docker://ghcr.io/sathirak/container-registry-cleaner:latest
