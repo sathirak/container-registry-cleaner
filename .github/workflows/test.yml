@@ -1,12 +1,17 @@
 name: Test My Go Action
 
-on: [push, 'workflow_dispatch']
+on:
+  push:
+  workflow_dispatch:
 
 jobs:
   test-job:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker://ghcr.io/sathirak/container-registry-cleaner:latest
+      - uses: sathirak/container-registry-cleaner@v2
         with:
+          registry: 'ghcr.io'
           name: 'library/alpine'
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}

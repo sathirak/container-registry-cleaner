@@ -4,9 +4,18 @@ author: My name
 description: My description
 
 inputs:
+  registry:
+    description: 'Registry host (e.g. ghcr.io, docker.io)'
+    required: false
   name:
-    description: 'A value to print'
+    description: 'Repository name (e.g. library/alpine)'
     required: true
+  username:
+    description: 'Registry username (optional, for private registries)'
+    required: false
+  password:
+    description: 'Registry password (optional, for private registries)'
+    required: false
 
 runs:
   using: docker
