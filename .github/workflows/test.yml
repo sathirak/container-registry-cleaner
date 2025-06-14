@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: sathirak/container-registry-cleaner@v2
+      - uses: sathirak/container-registry-cleaner@v1
         with:
           registry: 'ghcr.io'
           name: 'library/alpine'
