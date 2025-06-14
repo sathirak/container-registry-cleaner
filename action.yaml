@@ -3,6 +3,11 @@ name: My action
 author: My name
 description: My description
 
+inputs:
+  val:
+    description: 'A value to print'
+    required: true
+
 runs:
   using: docker
   image: Dockerfile

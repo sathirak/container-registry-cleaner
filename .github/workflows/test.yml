@@ -1,0 +1,11 @@
+on:
+    push:
+    workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: My action
+        uses: sathirak/container-registry-cleaner@latest
+    

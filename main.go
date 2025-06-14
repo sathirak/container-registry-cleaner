@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/sethvargo/go-githubactions"
 )
 
@@ -9,4 +11,6 @@ func main() {
 	if val == "" {
 		githubactions.Fatalf("missing 'val'")
 	}
+
+	fmt.Println("Hello, world!")
 }
