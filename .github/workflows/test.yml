@@ -1,4 +1,4 @@
-name: Test My Go Action
+name: Container Registry Cleaner
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Clean images
+      - name: Clean images [ private ]
         uses: sathirak/container-registry-cleaner@latest
         with:
           registry: ghcr.io
@@ -18,8 +18,8 @@ jobs:
           username: sathirak
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Clean images
+      - name: Clean images [ public ]
         uses: sathirak/container-registry-cleaner@latest
         with:
-          registry: ghcr.io
+          registry: index.docker.io
           name: library/alpine
