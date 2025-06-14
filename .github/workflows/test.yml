@@ -12,6 +12,6 @@ jobs:
       - uses: sathirak/container-registry-cleaner@latest
         with:
           registry: 'ghcr.io'
-          name: 'library/alpine'
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: 'sathirak/container-registry-cleaner'
+          username: 'sathirak'
+          password: ${{ secrets.GITHUB_TOKEN }}
