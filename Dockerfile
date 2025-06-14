@@ -6,7 +6,12 @@ ENV GO111MODULE=on \
     GOARCH=amd64
 
 RUN apt-get -qq update && \
-    apt-get -yqq install upx
+    apt-get -yqq install wget ca-certificates && \
+    wget -q https://github.com/upx/upx/releases/download/v4.2.1/upx-4.2.1-amd64_linux.tar.xz && \
+    tar -xf upx-4.2.1-amd64_linux.tar.xz && \
+    mv upx-4.2.1-amd64_linux/upx /usr/local/bin/ && \
+    rm -rf upx-4.2.1-amd64_linux* && \
+    apt-get purge -y --auto-remove wget ca-certificates
 
 WORKDIR /src
 COPY . .
