@@ -1,0 +1,13 @@
+# your-repo/action.yml
+name: My action
+author: My name
+description: My description
+
+inputs:
+  name:
+    description: 'Docker Registry name'
+    required: true
+
+runs:
+  using: docker
+  image: Dockerfile
