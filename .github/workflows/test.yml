@@ -13,8 +13,8 @@ jobs:
       - name: Clean images
         uses: sathirak/container-registry-cleaner@latest
         with:
-          registry: ghcr.io
+          registry: ghcr
           name: sathirak/container-registry-cleaner
           username: sathirak
           password: ${{ secrets.GITHUB_TOKEN }}
-          max-images: 1
+          max-images: 4

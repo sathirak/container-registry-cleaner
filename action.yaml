@@ -5,8 +5,13 @@ description: My description
 
 inputs:
   registry:
-    description: 'Registry host (e.g. ghcr.io, docker.io)'
-    required: false
+    description: 'Registry type'
+    required: true
+    type: choice
+    options:
+      - ghcr
+      - dockerhub
+      - digitalocean
   name:
     description: 'Repository name (e.g. library/alpine)'
     required: true

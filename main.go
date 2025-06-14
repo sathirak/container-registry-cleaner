@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/go-containerregistry/pkg/authn"
@@ -12,6 +15,27 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 	"github.com/sethvargo/go-githubactions"
 )
+
+func deleteDigitalOceanTag(token, repo, tag string) error {
+	// repo is expected to be like "namespace/repo"
+	url := fmt.Sprintf("https://api.digitalocean.com/v2/registry/repositories/%s/tags/%s", repo, tag)
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 204 {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("unexpected status: %d, body: %s", resp.StatusCode, string(body))
+	}
+	return nil
+}
 
 func main() {
 	registry := githubactions.GetInput("registry")
@@ -31,9 +55,20 @@ func main() {
 		githubactions.Fatalf("invalid 'max-images': %v", err)
 	}
 
-	fullRepo := repoName
-	if registry != "" {
-		fullRepo = fmt.Sprintf("%s/%s", registry, repoName)
+	var fullRepo string
+	switch registry {
+	case "ghcr":
+		fullRepo = fmt.Sprintf("ghcr.io/%s", repoName)
+	case "dockerhub":
+		if strings.Contains(repoName, "/") {
+			fullRepo = repoName
+		} else {
+			fullRepo = fmt.Sprintf("library/%s", repoName)
+		}
+	case "digitalocean":
+		fullRepo = fmt.Sprintf("registry.digitalocean.com/%s", repoName)
+	default:
+		githubactions.Fatalf("unsupported registry: %s", registry)
 	}
 
 	ref, err := name.NewRepository(fullRepo)
@@ -102,15 +137,41 @@ func main() {
 	if maxImages > 0 && len(tagInfos) > maxImages {
 		toDelete := tagInfos[maxImages:]
 		for _, ti := range toDelete {
-			tagRef, err := name.NewTag(fmt.Sprintf("%s:%s", fullRepo, ti.tag))
-			if err != nil {
-				fmt.Printf("%s: error parsing tag for deletion: %v\n", ti.tag, err)
+			// Skip deletion for tags that look like digests (e.g., sha-xxxxxx)
+			if len(ti.tag) > 4 && ti.tag[:4] == "sha-" {
+				fmt.Printf("Skipping deletion for digest-like tag: %s (unsupported by registry)\n", ti.tag)
 				continue
 			}
-			fmt.Printf("Deleting tag: %s\n", ti.tag)
-			err = remote.Delete(tagRef, opts...)
-			if err != nil {
-				fmt.Printf("%s: error deleting tag: %v\n", ti.tag, err)
+
+			switch registry {
+			case "digitalocean":
+				fmt.Printf("Deleting tag from DigitalOcean: %s\n", ti.tag)
+				err := deleteDigitalOceanTag(password, repoName, ti.tag)
+				if err != nil {
+					fmt.Printf("%s: error deleting tag from DigitalOcean: %v\n", ti.tag, err)
+				}
+			case "ghcr":
+				tagRef, err := name.NewTag(fmt.Sprintf("%s:%s", fullRepo, ti.tag))
+				if err != nil {
+					fmt.Printf("%s: error parsing tag for deletion: %v\n", ti.tag, err)
+					continue
+				}
+				fmt.Printf("Deleting tag from GHCR: %s\n", ti.tag)
+				err = remote.Delete(tagRef, opts...)
+				if err != nil {
+					fmt.Printf("%s: error deleting tag from GHCR: %v\n", ti.tag, err)
+				}
+			case "dockerhub":
+				tagRef, err := name.NewTag(fmt.Sprintf("%s:%s", fullRepo, ti.tag))
+				if err != nil {
+					fmt.Printf("%s: error parsing tag for deletion: %v\n", ti.tag, err)
+					continue
+				}
+				fmt.Printf("Deleting tag from Docker Hub: %s\n", ti.tag)
+				err = remote.Delete(tagRef, opts...)
+				if err != nil {
+					fmt.Printf("%s: error deleting tag from Docker Hub: %v\n", ti.tag, err)
+				}
 			}
 		}
 	}
