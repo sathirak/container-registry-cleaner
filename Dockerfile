@@ -1,37 +1,8 @@
 FROM golang:1.24 AS builder
-
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
-
-RUN apt-get -qq update && \
-    apt-get -yqq install wget ca-certificates && \
-    wget -q https://github.com/upx/upx/releases/download/v4.2.1/upx-4.2.1-amd64_linux.tar.xz && \
-    tar -xf upx-4.2.1-amd64_linux.tar.xz && \
-    mv upx-4.2.1-amd64_linux/upx /usr/local/bin/ && \
-    rm -rf upx-4.2.1-amd64_linux* && \
-    apt-get purge -y --auto-remove wget ca-certificates
-
 WORKDIR /src
 COPY . .
+RUN go build -o /bin/app .
 
-RUN go build \
-    -ldflags "-s -w -extldflags '-static'" \
-    -o /bin/app \
-    . \
-    && strip /bin/app \
-    && upx -q -9 /bin/app
-
-RUN echo "nobody:x:65534:65534:Nobody:/:" > /etc_passwd
-
-
-
-FROM scratch
-
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /etc_passwd /etc/passwd
-COPY --from=builder --chown=65534:0 /bin/app /app
-
-USER nobody
-ENTRYPOINT ["/app"]
+FROM gcr.io/distroless/base-debian12
+COPY --from=builder /bin/app /bin/app
+ENTRYPOINT ["/bin/app"]
