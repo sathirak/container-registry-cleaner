@@ -16,5 +16,5 @@ jobs:
           registry: ghcr
           name: sathirak/container-registry-cleaner
           username: sathirak
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
           max-images: 4
