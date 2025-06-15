@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Clean images
-        uses: sathirak/container-registry-cleaner@v2
+        uses: sathirak/container-registry-cleaner@v3
         with:
           registry: ghcr
           name: sathirak/container-registry-cleaner
