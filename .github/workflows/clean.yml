@@ -13,7 +13,7 @@ jobs:
       - name: Clean images
         uses: sathirak/container-registry-cleaner@v3
         with:
-          registry: ghcr
+          registry: docr
           name: registry.digitalocean.com/rv-cr
           username: sathirak
           password: ${{ secrets.REGISTRY_PASSWORD }}

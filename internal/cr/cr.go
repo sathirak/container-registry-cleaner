@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
+	"github.com/sathirak/container-registry-cleaner/internal/registry"
 	"github.com/sathirak/container-registry-cleaner/internal/types"
 )
 
@@ -18,7 +19,12 @@ func CleanRegistry(config types.Config) error {
 	}
 
 	var opts []remote.Option
-	if config.Username != "" && config.Password != "" {
+	if config.Registry == "docr" || config.Registry == "registry.digitalocean.com" {
+		opts, err = registry.DOCRAuthOptions(config.Password)
+		if err != nil {
+			return err
+		}
+	} else if config.Username != "" && config.Password != "" {
 		auth := &authn.Basic{
 			Username: config.Username,
 			Password: config.Password,
