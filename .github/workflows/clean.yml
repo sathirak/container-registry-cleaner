@@ -14,7 +14,7 @@ jobs:
         uses: sathirak/container-registry-cleaner@v3
         with:
           registry: ghcr
-          name: sathirak/container-registry-cleaner
+          name: ghcr.io/sathirak/container-registry-cleaner
           username: sathirak
           password: ${{ secrets.REGISTRY_PASSWORD }}
           max-images: 4
