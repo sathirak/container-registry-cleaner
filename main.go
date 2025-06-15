@@ -119,12 +119,10 @@ func main() {
 		tagInfos = append(tagInfos, tagInfo{tag: tag, created: created})
 	}
 
-	// Sort tags by creation date, newest first
 	sort.Slice(tagInfos, func(i, j int) bool {
 		return tagInfos[i].created.After(tagInfos[j].created)
 	})
 
-	// Print all tags with creation date
 	for _, ti := range tagInfos {
 		created := ""
 		if !ti.created.IsZero() {
@@ -133,13 +131,41 @@ func main() {
 		fmt.Printf("%s\t%s\n", ti.tag, created)
 	}
 
-	// Delete older tags if exceeding maxImages
 	if maxImages > 0 && len(tagInfos) > maxImages {
 		toDelete := tagInfos[maxImages:]
 		for _, ti := range toDelete {
-			// Skip deletion for tags that look like digests (e.g., sha-xxxxxx)
-			if len(ti.tag) > 4 && ti.tag[:4] == "sha-" {
-				fmt.Printf("Skipping deletion for digest-like tag: %s (unsupported by registry)\n", ti.tag)
+			// Improved digest-like tag detection
+			shouldSkip := false
+			skipReason := ""
+
+			switch registry {
+			case "ghcr":
+				// For GHCR, skip tags that look like Git commit SHAs (sha- followed by hex characters)
+				if len(ti.tag) >= 11 && ti.tag[:4] == "sha-" {
+					// Check if the part after "sha-" contains only hex characters
+					hexPart := ti.tag[4:]
+					isHex := true
+					for _, char := range hexPart {
+						if !((char >= '0' && char <= '9') || (char >= 'a' && char <= 'f') || (char >= 'A' && char <= 'F')) {
+							isHex = false
+							break
+						}
+					}
+					if isHex && len(hexPart) >= 7 {
+						shouldSkip = true
+						skipReason = "Git commit SHA tag"
+					}
+				}
+			case "digitalocean", "dockerhub":
+				// For other registries, use the original logic
+				if len(ti.tag) > 4 && ti.tag[:4] == "sha-" {
+					shouldSkip = true
+					skipReason = "digest-like tag"
+				}
+			}
+
+			if shouldSkip {
+				fmt.Printf("Skipping deletion for %s: %s (unsupported by registry)\n", skipReason, ti.tag)
 				continue
 			}
 

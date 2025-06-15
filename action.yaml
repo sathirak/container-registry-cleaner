@@ -5,13 +5,9 @@ description: My description
 
 inputs:
   registry:
-    description: 'Registry type'
+    description: 'Registry type ghcr, dockerhub, digitalocean'
     required: true
-    type: choice
-    options:
-      - ghcr
-      - dockerhub
-      - digitalocean
+    default: 'ghcr'
   name:
     description: 'Repository name (e.g. library/alpine)'
     required: true
