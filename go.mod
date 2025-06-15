@@ -1,4 +1,4 @@
-module github.com/wavezync/digitalocean-registry-cleanup
+module github.com/sathirak/container-registry-cleaner
 
 go 1.24.3
 

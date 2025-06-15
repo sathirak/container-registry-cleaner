@@ -23,3 +23,8 @@ docker:
 
 test:
 	@$(GO) test ./...
+
+tag:
+	@if [ -z "$(TAG)" ]; then echo "Usage: make tag TAG=your_tag"; exit 1; fi
+	@git tag $(TAG)
+	@git push origin $(TAG)
